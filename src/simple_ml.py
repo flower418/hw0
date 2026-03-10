@@ -164,7 +164,35 @@ def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
+    # m: num_examples
+    # n: input_dim
+    # k: num_classes
+    # l: hidden_dim
+    # W1: n*l
+    # W2: l*k
+    # X_batch: batch*n
+    # y_batch: batch*1
+    num_examples = X.shape[0]
+    num_classes = W2.shape[1]
+    
+    for start in range(0, num_examples, batch):
+        X_batch = X[start:start+batch, :]
+        y_batch = y[start:start+batch]
+        
+        Z1 = np.maximum(0, X_batch @ W1) # relu
+        indicator = (Z1 > 0).astype(int) # batch*l
+        
+        I_y = np.zeros((batch, num_classes)) # 这里 zeros 传入形状的时候必须加括号
+        I_y[np.arange(batch), y_batch] = 1
+        
+        G2 = np.exp(Z1 @ W2) / np.sum(np.exp(Z1 @ W2), axis=1, keepdims=True) - I_y
+        G1 = indicator * (G2 @ W2.T)
+        
+        gd_W1 = X_batch.T @ G1 / batch
+        gd_W2 = Z1.T @ G2 / batch
+        
+        W1 -= lr * gd_W1
+        W2 -= lr * gd_W2
     ### END YOUR CODE
 
 
