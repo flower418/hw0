@@ -119,8 +119,25 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    loss = softmax_loss(X, y)
+    # num_examples: m
+    # num_classes: k
+    # x_input_dim: n
+    num_examples = X.shape[0] # m
+    num_classes = theta.shape[1] # k
     
+    for start in range(0, num_examples, batch):
+        X_batch = X[start:start+batch, :] # batch*n
+        y_batch = y[start:start+batch] # batch*1
+        
+        I_y = np.zeros((batch, num_classes)) # batch*k
+        I_y[np.arange(batch), y_batch] = 1
+        
+        # theta: n*k
+        hx = X_batch @ theta # batch*k
+        Z = np.exp(hx) / np.sum(np.exp(hx), axis=1, keepdims=True) # batch*k
+        
+        gd_loss = X_batch.T @ (Z - I_y) / batch # n*k
+        theta -= lr * gd_loss
     ### END YOUR CODE
 
 
