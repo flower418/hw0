@@ -20,7 +20,7 @@ def add(x, y):
         Sum of x + y
     """
     ### BEGIN YOUR CODE
-    pass
+    return x + y
     ### END YOUR CODE
 
 
@@ -48,7 +48,33 @@ def parse_mnist(image_filename, label_filename):
                 for MNIST will contain the values 0-9.
     """
     ### BEGIN YOUR CODE
-    pass
+    # MNIST 的图像文件前 16 个字节分别为：
+    # magic number
+    # number of images
+    # number of rows
+    # number of cols
+    # 按大端序排序
+    # 这里需要用到 gzip 的 open
+    with gzip.open(image_filename, "rb") as f_img, gzip.open(label_filename, "rb") as f_lbl:
+        magic_img = int.from_bytes(f_img.read(4), "big")
+        num_images = int.from_bytes(f_img.read(4), "big")
+        rows = int.from_bytes(f_img.read(4), "big")
+        cols = int.from_bytes(f_img.read(4), "big")
+        
+        img_data = f_img.read()
+        X = np.frombuffer(img_data, dtype=np.uint8).reshape(num_images, rows*cols) # np.frombuffer 直接将读取出来的 img_data 转为 np 数组
+        X = X.astype(np.float32) / 255
+    
+        # MNIST 的标签文件前 8 个字节：
+        # magic number
+        # number of labels
+        magic_lbl = int.from_bytes(f_lbl.read(4), "big")
+        num_labels = int.from_bytes(f_lbl.read(4), "big")
+        
+        lbl_data = f_lbl.read()
+        y = np.frombuffer(lbl_data, dtype=np.uint8)
+        
+    return X, y
     ### END YOUR CODE
 
 
@@ -68,7 +94,9 @@ def softmax_loss(Z, y):
         Average softmax loss over the sample.
     """
     ### BEGIN YOUR CODE
-    pass
+    # 这里需要使用高级索引来获取 z_y
+    num_samples = len(y)
+    return np.sum(np.log(np.sum(np.exp(Z), axis=1)) - Z[np.arange(num_samples), y]) / num_samples
     ### END YOUR CODE
 
 
@@ -91,7 +119,8 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
+    loss = softmax_loss(X, y)
+    
     ### END YOUR CODE
 
 
