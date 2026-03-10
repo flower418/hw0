@@ -1,0 +1,5 @@
+.vscode
+.pytest_cache
+src/__pycache__
+hw0.ipynb
+tests/__pycache__
